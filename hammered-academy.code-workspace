@@ -1,0 +1,65 @@
+{
+  "folders": [
+    {
+      "name": "api",
+      "path": "api"
+    },
+    {
+      "name": "web",
+      "path": "web"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true
+    },
+    "python.envFile": "${workspaceFolder}/api/.env",
+    "typescript.tsdk": "${workspaceFolder}/web/node_modules/typescript/lib",
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Api",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": [
+          "src.api.main:app",
+          "--reload",
+          "--port",
+          "8000"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": true,
+        "jinja": true,
+        "cwd": "${workspaceFolder:api}"
+      },
+      {
+        "name": "Debug Next.js",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "pnpm",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder:web}"
+      }
+    ],
+    "compounds": [
+      {
+        "name": "Debug All",
+        "configurations": [
+          "Debug Api",
+          "Debug Next.js"
+        ]
+      }
+    ]
+  }
+}
