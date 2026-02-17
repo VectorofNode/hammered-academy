@@ -17,7 +17,6 @@
       "**/.git": true,
       "**/.DS_Store": true
     },
-    "python.envFile": "${workspaceFolder}/api/.env",
     "typescript.tsdk": "${workspaceFolder}/web/node_modules/typescript/lib",
   },
   "launch": {
