@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function Page({params}: {params: Promise<PageProps>}) {
     const uuid = (await params).uuid
-    const course: Course = {title: "", image: "", description: "aklvndk", uuid: uuid}
+    const course: Course = {title: "", image: "", description: "aklvndk", uuid: uuid} //TODO: Get by uuid
 
     return(
         <>
