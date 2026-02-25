@@ -57,11 +57,19 @@ async def delete_course(uuid: str, session: SessionDep):
     return
 
 
-@router.put("/{uuid}")
+@router.put(
+    "/{uuid}",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": Message},
+        status.HTTP_400_BAD_REQUEST: {"model": Message},
+    },
+)
 async def update_course(uuid: str, course: Course, session: SessionDep) -> Course:
     course_db = session.exec(select(CourseDb).where(CourseDb.uuid == uuid)).first()
     if not course_db:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if uuid != course.uuid:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST)
     course_db.sqlmodel_update(course)
     session.add(course_db)
     session.commit()
