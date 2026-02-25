@@ -12,8 +12,8 @@ export function CourseCard({image, title, description, uuid}: Course) {
     return (
         <>
             <Card className="w-fit hover:cursor-pointer" onClick={() => router.push(`/courses/${uuid}`)}>
-                <div className="w-3xs h-32 overflow-hidden">
-                    {image == ""
+                <div className="flex w-3xs h-32 overflow-hidden items-center justify-center">
+                    {image != ""
                         ? <Image src={image} alt="" width={256} height={128} className="object-cover object-center" />
                         : <ImageOff />}
                 </div>
