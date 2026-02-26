@@ -5,14 +5,21 @@ from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 
 from api.services.postgres import SessionDep
-from models.course import Course, CourseDb
+from models.course import (
+    CourseBase,
+    CourseCreate,
+    CourseCreateWithSections,
+    CourseDb,
+    CourseRead,
+)
 from models.message import Message
+from models.section import SectionDb
 
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
 
-@router.get("/", response_model=list[Course])
+@router.get("/", response_model=list[CourseBase])
 async def get_all_courses(
     session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
 ):
@@ -22,7 +29,7 @@ async def get_all_courses(
 
 @router.get(
     "/{uuid}",
-    response_model=Course,
+    response_model=CourseRead,
     responses={404: {"model": Message}},
 )
 async def get_course_by_uuid(uuid: str, session: SessionDep):
@@ -32,15 +39,17 @@ async def get_course_by_uuid(uuid: str, session: SessionDep):
     return course
 
 
-@router.post("/")
-async def create_new_course(course: Course, session: SessionDep) -> Course:
+@router.post("/", response_model=CourseBase)
+async def create_new_course(course: CourseCreate, session: SessionDep):
     try:
-        session.add(CourseDb.model_validate(course))
+        db_course = CourseDb.model_validate(course)
+        session.add(db_course)
         session.commit()
     except IntegrityError:
         session.rollback()
         raise HTTPException(400, "Invalid uuid")
-    return course
+    session.refresh(db_course)
+    return db_course
 
 
 @router.delete(
@@ -64,7 +73,9 @@ async def delete_course(uuid: str, session: SessionDep):
         status.HTTP_400_BAD_REQUEST: {"model": Message},
     },
 )
-async def update_course(uuid: str, course: Course, session: SessionDep) -> Course:
+async def update_course(
+    uuid: str, course: CourseBase, session: SessionDep
+) -> CourseBase:
     course_db = session.exec(select(CourseDb).where(CourseDb.uuid == uuid)).first()
     if not course_db:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
