@@ -5,21 +5,13 @@ from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 
 from api.services.postgres import SessionDep
-from models.course import (
-    CourseBase,
-    CourseCreate,
-    CourseCreateWithSections,
-    CourseDb,
-    CourseRead,
-)
-from models.message import Message
-from models.section import SectionDb
+from models import CourseBase, CourseCreate, CourseDb, CourseRead, Message
 
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
 
-@router.get("/", response_model=list[CourseBase])
+@router.get("", response_model=list[CourseBase])
 async def get_all_courses(
     session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
 ):
@@ -39,7 +31,7 @@ async def get_course_by_uuid(uuid: str, session: SessionDep):
     return course
 
 
-@router.post("/", response_model=CourseBase)
+@router.post("", response_model=CourseBase)
 async def create_new_course(course: CourseCreate, session: SessionDep):
     try:
         db_course = CourseDb.model_validate(course)

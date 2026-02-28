@@ -1,11 +1,13 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
-from models.course import CourseDb
-from models.lesson import LessonDb, LessonRead
+from models.lesson import LessonRead, LessonDb
+
+if TYPE_CHECKING:
+    from .course import CourseDb
 
 
 class SectionBase(SQLModel):
@@ -16,7 +18,7 @@ class SectionBase(SQLModel):
 
 class SectionDb(SectionBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    course_uuid: Optional[UUID] = Field(default=None, foreign_key="course.uuid")
+    course_uuid: Optional[UUID] = Field(default=None, foreign_key="coursedb.uuid")
     course: "CourseDb" = Relationship(back_populates="sections")
     lessons: List[LessonDb] = Relationship(back_populates="section")
 
@@ -29,3 +31,8 @@ class SectionCreate(BaseModel):
     title: str
     order: int
     course_uuid: UUID
+
+
+class SectionCreateBatch(BaseModel):
+    course_uuid: UUID
+    sections: List[SectionCreate]

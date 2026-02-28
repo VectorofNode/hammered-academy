@@ -2,9 +2,12 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
-from typing import List
+from typing import TYPE_CHECKING, List
 
-from models.section import SectionBase, SectionCreate, SectionRead
+from models.section import SectionCreate, SectionRead
+
+if TYPE_CHECKING:
+    from .section import SectionDb
 
 
 class CourseBase(SQLModel):
@@ -16,7 +19,7 @@ class CourseBase(SQLModel):
 
 class CourseDb(CourseBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    Sections: List["SectionBase"] = Relationship(back_populates="course")
+    sections: List["SectionDb"] = Relationship(back_populates="course")
 
 
 class CourseRead(CourseBase):
