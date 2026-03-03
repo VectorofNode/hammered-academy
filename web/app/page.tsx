@@ -7,7 +7,7 @@ export default function Home() {
       <NavBar />
       <div className="m-4">
         <div className=" text-xl">All Courses</div>
-        <CourseGrid courses={[{title: "cc", uuid: "cc", description: "", image: ""}]} />
+        <CourseGrid />
       </div>
     </>
   );
