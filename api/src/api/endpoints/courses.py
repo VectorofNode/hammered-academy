@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
@@ -11,9 +11,11 @@ from models import CourseBase, CourseCreate, CourseDb, CourseRead, Message
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
 
-@router.get("", response_model=list[CourseBase])
+@router.get("", response_model=List[CourseBase])
 async def get_all_courses(
-    session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
 ):
     courses = session.exec(select(CourseDb).offset(offset).limit(limit)).all()
     return courses
