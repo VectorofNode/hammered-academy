@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function Page({params}: {params: Promise<PageProps>}) {
     const uuid = (await params).uuid
-    const course: Course = {title: "", image: "", description: "aklvndk", uuid: uuid} //TODO: Get by uuid
+    const course: Course = {title: "Title", image: "", description: "aklvndk", uuid: uuid} //TODO: Get by uuid
 
     return(
         <>
@@ -26,7 +26,7 @@ export default async function Page({params}: {params: Promise<PageProps>}) {
                     {course.description}
                 </div>
                 <div className="flex flex-col gap-2 w-1/3">
-                    <div className="text-2xl">{uuid}</div>
+                    <div className="text-2xl">{course.title}</div>
                     <Button>Join Course</Button>
                 </div>
             </div>
