@@ -1,15 +1,16 @@
-import boto3
-from botocore.config import Config
+from typing import Annotated
+from fastapi import Depends
+from s3fs import S3FileSystem
 
-s3_conf = Config(signature_version="s3")
-access_key = ""
-secret_key = ""
-endpoint_url = ""
 
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_key,
-    endpoint_url=endpoint_url,
-)
-s3_resourse = boto3.resource()
+def get_s3_client():
+    s3 = S3FileSystem(
+        endpoint_url="http://localhost:5000", key="test", secret="test", token="test"
+    )
+    try:
+        yield s3
+    finally:
+        pass
+
+
+S3Deps = Annotated[S3FileSystem, Depends(get_s3_client)]

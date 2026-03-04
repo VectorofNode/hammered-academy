@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .endpoints import courses_router, sections_router, lessons_router
+from .endpoints import courses_router, sections_router, lessons_router, media_router
 from api.services.postgres import create_db_and_tables
 from models import CourseDb, SectionDb, LessonDb
 
@@ -33,3 +33,4 @@ app.add_middleware(
 app.include_router(courses_router)
 app.include_router(sections_router)
 app.include_router(lessons_router)
+app.include_router(media_router)
