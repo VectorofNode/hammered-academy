@@ -33,6 +33,14 @@ async def get_course_by_uuid(uuid: str, session: SessionDep):
     return course
 
 
+@router.get("/{uuid}/curriculum", response_model=CourseRead)
+async def get_course_curriculum(uuid: str, session: SessionDep):
+    course = session.exec(select(CourseDb).where(CourseDb.uuid == uuid)).first()
+    if not course:
+        raise HTTPException(404, f"The uuid: {uuid} is not found in the database.")
+    return course
+
+
 @router.post("", response_model=CourseBase)
 async def create_new_course(course: CourseCreate, session: SessionDep):
     try:
