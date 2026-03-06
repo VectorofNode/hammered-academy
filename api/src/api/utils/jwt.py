@@ -9,6 +9,6 @@ def create_access_token(subject: Union[str, Any], exp_delta: timedelta):
     expires = datetime.now(timezone.utc) + exp_delta
     to_encode = {"exp": expires, "sub": str(subject)}
 
-    encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY", ""), algorithm="EdDSA")
+    encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY", ""), algorithm="HS256")
 
     return encoded_jwt
