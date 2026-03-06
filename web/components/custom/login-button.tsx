@@ -3,18 +3,14 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "../ui/button";
 import { LogIn, LogOut } from "lucide-react";
+import { UserInfoPopover } from "./user-info-popover";
 
 export function LoginButton() {
     const {data: session} = useSession()
 
     if (session) {
         return(
-            <div>
-                {session.user?.email}
-                <Button size={"icon"} onClick={() => signOut()}>
-                    <LogOut />
-                </Button>
-            </div>
+            <UserInfoPopover />
         )
     }
 
