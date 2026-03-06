@@ -2,6 +2,7 @@ import { NavLink } from "@/lib/models/nav-link";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { LoginButton } from "./login-button";
 
 const links: NavLink[] = [
     {
@@ -29,7 +30,7 @@ export function NavBar() {
                         </NavigationMenuList>
                     </NavigationMenu>
                 </div>
-                <Button>Login</Button>
+                <LoginButton />
             </div>
         </>
     )

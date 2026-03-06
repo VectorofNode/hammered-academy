@@ -38,6 +38,10 @@ async def get_course_curriculum(uuid: str, session: SessionDep):
     course = session.exec(select(CourseDb).where(CourseDb.uuid == uuid)).first()
     if not course:
         raise HTTPException(404, f"The uuid: {uuid} is not found in the database.")
+
+    course.sections.sort(key=lambda x: x.order)
+    for section in course.sections:
+        section.lessons.sort(key=lambda x: x.order)
     return course
 
 
