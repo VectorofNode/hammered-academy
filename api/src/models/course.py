@@ -20,6 +20,7 @@ class CourseBase(SQLModel):
 class CourseDb(CourseBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     sections: List["SectionDb"] = Relationship(back_populates="course")
+    owner_id: int = Field(foreign_key="userdb.id", nullable=False)
 
 
 class CourseRead(CourseBase):
