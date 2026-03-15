@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import os
-from typing import Any, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -22,9 +22,7 @@ def create_access_token(subject: Union[str, Any], exp_delta: timedelta):
     return encoded_jwt
 
 
-def get_currrent_user(
-    session: SessionDep = Depends(get_session), token: str = Depends(oauth2_scheme)
-):
+def get_currrent_user(session: SessionDep, token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY", ""), "HS256")
         user_uuid = payload["sub"]
@@ -38,3 +36,6 @@ def get_currrent_user(
     if not user:
         raise HTTPException(404, "User not found")
     return user
+
+
+UserDeps = Annotated[UserDb, Depends(get_currrent_user)]

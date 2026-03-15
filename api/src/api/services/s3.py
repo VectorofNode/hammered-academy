@@ -1,16 +1,37 @@
 from typing import Annotated
 from fastapi import Depends
-from s3fs import S3FileSystem
+from minio import Minio, S3Error
+
+from api.settings import S3Settings, settings
+
+s3 = Minio(
+    settings.S3_ENDPOINT,
+    settings.S3_ACCESS_KEY,
+    settings.S3_SECRECT_KEY,
+    secure=False,
+)
+
+
+def check_and_create_buckets():
+    if not s3.bucket_exists(settings.S3_IMAGE_BUCKET):
+        s3.make_bucket(settings.S3_IMAGE_BUCKET)
+
+
+def check_object_exists(mc: Minio, bucket_name: str, object_name: str):
+    try:
+        mc.stat_object(bucket_name, object_name)
+    except S3Error as e:
+        if e.code == "NoSuchKey":
+            return False
+        raise Exception(e)
+    return True
 
 
 def get_s3_client():
-    s3 = S3FileSystem(
-        endpoint_url="http://localhost:5000", key="test", secret="test", token="test"
-    )
     try:
         yield s3
     finally:
         pass
 
 
-S3Deps = Annotated[S3FileSystem, Depends(get_s3_client)]
+S3Deps = Annotated[Minio, Depends(get_s3_client)]

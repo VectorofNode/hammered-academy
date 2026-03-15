@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.services.s3 import check_and_create_buckets
+
 from .endpoints import (
     courses_router,
     sections_router,
@@ -21,6 +23,7 @@ LessonDb.model_rebuild()
 @asynccontextmanager
 async def lifespam(app: FastAPI):
     create_db_and_tables()
+    check_and_create_buckets()
     yield
 
 

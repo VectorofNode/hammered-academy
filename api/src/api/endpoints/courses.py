@@ -1,13 +1,12 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 
 from api.services.postgres import SessionDep
-from api.utils.jwt import get_currrent_user
+from api.utils.jwt import UserDeps
 from models import CourseBase, CourseCreate, CourseDb, CourseRead, Message
-from models.user import UserDb
 
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
@@ -48,9 +47,7 @@ async def get_course_curriculum(uuid: str, session: SessionDep):
 
 
 @router.post("", response_model=CourseBase)
-async def create_new_course(
-    course: CourseCreate, session: SessionDep, user: UserDb = Depends(get_currrent_user)
-):
+async def create_new_course(course: CourseCreate, session: SessionDep, user: UserDeps):
     try:
         user_id = user.id
         if not user_id:
