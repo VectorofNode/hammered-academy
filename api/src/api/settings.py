@@ -35,7 +35,7 @@ class Settings(BaseSettings):
 
     S3_IMAGE_BUCKET: str = "hammered-academy-image"
 
-    google_api_client_id: str
+    GOOGLE_API_CLIENT_ID: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

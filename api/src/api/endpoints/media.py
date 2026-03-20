@@ -1,8 +1,9 @@
 from io import BytesIO
 from pathlib import Path
+from typing import Annotated
 from uuid import uuid4
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, Header, UploadFile
 from fastapi.responses import StreamingResponse
 
 from api.services.postgres import SessionDep
@@ -15,7 +16,7 @@ from api.settings import settings
 router = APIRouter(prefix="/media", tags=["Media"])
 
 
-@router.get("/image/{uuid}")
+@router.get("/images/{uuid}")
 async def get_image_by_uuid(s3: S3Deps, uuid: str):
     if not check_object_exists(s3, settings.S3_ENDPOINT, uuid):
         raise HTTPException(404, "file not found")
@@ -30,11 +31,12 @@ async def get_image_by_uuid(s3: S3Deps, uuid: str):
             raise HTTPException(500, "content type error")
 
 
-@router.post("/image")
+@router.post("/images")
 async def upload_image(
     session: SessionDep,
     s3: S3Deps,
     current_user: UserDeps,
+    access_token: Annotated[str | None, Header()] = None,
     file: UploadFile = File(...),
 ):
     filename = file.filename
