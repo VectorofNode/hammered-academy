@@ -6,6 +6,12 @@ export interface Section {
     order: number
 }
 
+export interface SectionCreate {
+    course_uuid: string,
+    title: string,
+    order: number
+}
+
 export interface SectionWithLessons {
     uuid: string,
     title: string,
