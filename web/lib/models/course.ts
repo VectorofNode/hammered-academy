@@ -14,3 +14,9 @@ export interface CourseFull {
     uuid: string,
     sections: SectionWithLessons[]
 }
+
+export interface CourseCreate {
+    image: string,
+    title: string,
+    description: string
+}

@@ -8,12 +8,11 @@ import Image from "next/image"
 
 interface UploadImageFieldProps {
     onChange: (file: File) => void
+    imageObjectUrl: string | null
 }
 
-export function UploadImageField({ onChange }: UploadImageFieldProps) {
+export function UploadImageField({ onChange, imageObjectUrl }: UploadImageFieldProps) {
     const uploadRef = useRef<HTMLInputElement>(null)
-    
-    const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null)
 
     const uploadImage = () => {
         const currentRef = uploadRef.current
@@ -25,14 +24,13 @@ export function UploadImageField({ onChange }: UploadImageFieldProps) {
 
     const imageRecieved = (file: File) => {
         onChange(file)
-        setSelectedFileUrl(URL.createObjectURL(file))
     }
 
     return (
         <Field className="flex">
             <FieldLabel>Image</FieldLabel>
             <FieldContent>
-                {!selectedFileUrl? 
+                {!imageObjectUrl? 
                     <Empty className="border border-dashed">
                         <EmptyHeader>
                             <EmptyMedia>
@@ -50,7 +48,7 @@ export function UploadImageField({ onChange }: UploadImageFieldProps) {
                     </Empty> :
                     <div className="w-full flex flex-col">
                         <div className="flex w-full overflow-hidden border border-dashed h-60 rounded-xl relative justify-center items-center">
-                            <Image src={selectedFileUrl} alt="" fill objectFit="cover" />
+                            <Image src={imageObjectUrl} alt="" fill objectFit="cover" />
                         </div>
                         <Button onClick={() => uploadImage()}>
                             <Upload />

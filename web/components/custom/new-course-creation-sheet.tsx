@@ -8,11 +8,11 @@ import { SectionCreate } from "@/lib/models/section";
 
 interface NewCourseCreationSheetProps {
     onCreate: (section: SectionCreate) => void,
-    prev_order: number,
-    course_uuid: string
+    prevOrder: number,
+    courseUuid: string
 }
 
-export function NewCourseCreationSheet({ onCreate, prev_order, course_uuid }: NewCourseCreationSheetProps) {
+export function NewCourseCreationSheet({ onCreate, prevOrder: prev_order, courseUuid: course_uuid }: NewCourseCreationSheetProps) {
     const [title, setTitle] = useState("")
     const [order, setOrder] = useState("")
 

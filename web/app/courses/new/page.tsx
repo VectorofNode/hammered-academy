@@ -7,16 +7,18 @@ import { FieldDescription, FieldLegend, FieldSet } from "@/components/ui/field"
 import { uploadFile } from "@/lib/utils/medias"
 import { courseSchema } from "@/lib/validations/course"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Plus, Save, SaveIcon } from "lucide-react"
+import { SaveIcon } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { UploadImageField } from "@/components/custom/upload-image-field"
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Section, SectionCreate } from "@/lib/models/section"
+import { SectionCreate } from "@/lib/models/section"
 import { NewCourseSectionsList } from "@/components/custom/new-course-sections-table"
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item"
+import { CourseCreate } from "@/lib/models/course"
+import { createNewCourse, createSectionsForCourse } from "@/lib/utils/courses"
+import { toast } from "sonner"
 
 export default function Page() {
     const { data: session } = useSession()
@@ -29,14 +31,38 @@ export default function Page() {
         }
     })
 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null)
     const [imageUuid, setImageUuid] = useState("")
 
     const [sections, setSections] = useState<SectionCreate[]>([])
 
+    const [courseUuid, setCourseUuid] = useState("")
+
     const imageRecieved = (file: File) => {
-        setSelectedFile(file)
-        uploadFile(file).then((value) => setImageUuid(value.uuid))
+        setSelectedFileUrl(URL.createObjectURL(file))
+        console.log(session?.accessToken)
+        uploadFile(file, session?.accessToken)
+            .then((value) => setImageUuid(value.uuid))
+            .catch((err) => {
+                toast.error(`Error: ${err}`)
+                setSelectedFileUrl(null)
+            })
+    }
+
+    const createCourse = async () => {
+        const course: CourseCreate = {
+            title: form.getValues("title"), 
+            description: form.getValues("description"),
+            image: imageUuid
+        }
+        try {
+            const courseRes = await createNewCourse(course, session?.accessToken)
+            setCourseUuid(courseRes.uuid)
+            
+            createSectionsForCourse(courseRes.uuid, sections, session?.accessToken)
+        } catch (error) {
+            toast(`${error}`)
+        }
     }
 
     return (
@@ -48,7 +74,7 @@ export default function Page() {
                         <FieldSet>
                             <FieldLegend>Create course</FieldLegend>
                             <FieldDescription>Please provide information to create your course.</FieldDescription>
-                            <UploadImageField onChange={(file) => imageRecieved(file)} />
+                            <UploadImageField onChange={(file) => imageRecieved(file)} imageObjectUrl={selectedFileUrl} />
                             <NewCourseForm form={form} />
                         </FieldSet>
                     </div>
@@ -58,6 +84,7 @@ export default function Page() {
                             onSectionAdd={(section) => setSections(prev => [...prev, section])} 
                             onSectionDelete={() => {}} 
                             onSectionEdit={() => {}} 
+                            courseUuid={courseUuid}
                         />
                     </div>
                 </div>
@@ -71,7 +98,7 @@ export default function Page() {
                             <ItemDescription>Save your course now.</ItemDescription>
                         </ItemContent>
                         <ItemActions>
-                            <Button>Save</Button>
+                            <Button onClick={() => createCourse()}>Save</Button>
                         </ItemActions>
                     </Item>
                 </div>

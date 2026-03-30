@@ -8,13 +8,14 @@ export async function getFile(uuid:string) {
     const data = await res.json()
 }
 
-export async function uploadFile(file: File): Promise<FileInfo> {
+export async function uploadFile(file: File, accessToken: string): Promise<FileInfo> {
     const formData = new FormData()
     formData.append("file", file)
 
     const res = await fetch(`${env.API_URL}/medias/images`, {
         method: "POST",
-        body: formData
+        body: formData,
+        headers: {"Authorization": `Bearer ${accessToken}`}
     })
 
     return await res.json()

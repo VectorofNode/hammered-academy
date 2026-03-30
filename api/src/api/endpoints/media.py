@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated
 from uuid import uuid4
 
-from fastapi import APIRouter, File, HTTPException, Header, UploadFile
+from fastapi import APIRouter, File, HTTPException, Header, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
 from api.services.postgres import SessionDep
@@ -13,7 +13,7 @@ from models.file_info import FileInfoDb, FileUploadReturn
 from api.settings import settings
 
 
-router = APIRouter(prefix="/media", tags=["Media"])
+router = APIRouter(prefix="/medias", tags=["Media"])
 
 
 @router.get("/images/{uuid}")
@@ -47,7 +47,9 @@ async def upload_image(
     file_uuid = uuid4()
     file_name = f"{file_uuid}{file_extension}"
     content = await file.read()
-    s3.put_object(settings.S3_ENDPOINT, str(file_uuid), BytesIO(content), len(content))
+    s3.put_object(
+        settings.S3_IMAGE_BUCKET, str(file_uuid), BytesIO(content), len(content)
+    )
 
     user_id = current_user.id
     if not user_id:
@@ -56,7 +58,7 @@ async def upload_image(
     file_db = FileInfoDb(
         uuid=file_uuid,
         file_name=file_name,
-        file_path=f"s3://{settings.S3_ENDPOINT}/{file_name}",
+        file_path=f"s3://{settings.S3_IMAGE_BUCKET}/{file_name}",
         file_type="image",
         owner_id=user_id,
     )

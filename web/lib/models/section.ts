@@ -12,6 +12,11 @@ export interface SectionCreate {
     order: number
 }
 
+export interface SectionCreateBatch {
+    course_uuid: string,
+    sections: SectionCreate[]
+}
+
 export interface SectionWithLessons {
     uuid: string,
     title: string,

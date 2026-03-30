@@ -24,6 +24,7 @@ def create_access_token(subject: Union[str, Any], exp_delta: timedelta):
 
 def get_currrent_user(session: SessionDep, token: str = Depends(oauth2_scheme)):
     try:
+        print(token)
         payload = jwt.decode(token, os.getenv("SECRET_KEY", ""), "HS256")
         user_uuid = payload["sub"]
         if not user_uuid:

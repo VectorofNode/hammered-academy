@@ -10,9 +10,10 @@ interface NewCourseSectionsListProps {
     onSectionDelete: (section: SectionCreate) => void
     onSectionEdit: (section: SectionCreate) => void
     sections: SectionCreate[]
+    courseUuid: string
 }
 
-export function NewCourseSectionsList({ onSectionAdd, onSectionDelete, onSectionEdit, sections }: NewCourseSectionsListProps) {
+export function NewCourseSectionsList({ onSectionAdd, onSectionDelete, onSectionEdit, sections, courseUuid: course_uuid }: NewCourseSectionsListProps) {
     return (
         <>
             <Table>
@@ -36,7 +37,7 @@ export function NewCourseSectionsList({ onSectionAdd, onSectionDelete, onSection
                     ))}
                 </TableBody>
             </Table>
-            <NewCourseCreationSheet onCreate={(section) => onSectionAdd(section)} prev_order={sections.length} course_uuid="" />
+            <NewCourseCreationSheet onCreate={(section) => onSectionAdd(section)} prevOrder={sections.length} courseUuid={course_uuid} />
         </>
     )
 }
