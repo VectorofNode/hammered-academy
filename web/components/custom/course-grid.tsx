@@ -16,7 +16,7 @@ export function CourseGrid() {
         console.log(courses)
     }, [])
     return (
-        <div className="p-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="p-4 grid gap-4 sm:justify-center md:justify-center sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(258px,1fr))]">
             {courses?.map((course, id) => 
                 <CourseCard 
                     image={course.image} 

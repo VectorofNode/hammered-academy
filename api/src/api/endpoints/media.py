@@ -18,10 +18,10 @@ router = APIRouter(prefix="/medias", tags=["Media"])
 
 @router.get("/images/{uuid}")
 async def get_image_by_uuid(s3: S3Deps, uuid: str):
-    if not check_object_exists(s3, settings.S3_ENDPOINT, uuid):
+    if not check_object_exists(s3, settings.S3_IMAGE_BUCKET, uuid):
         raise HTTPException(404, "file not found")
 
-    with s3.get_object(settings.S3_ENDPOINT, uuid) as f:
+    with s3.get_object(settings.S3_IMAGE_BUCKET, uuid) as f:
         content = f.read()
         if isinstance(content, bytes):
             byte_io = BytesIO(content)
@@ -36,7 +36,6 @@ async def upload_image(
     session: SessionDep,
     s3: S3Deps,
     current_user: UserDeps,
-    access_token: Annotated[str | None, Header()] = None,
     file: UploadFile = File(...),
 ):
     filename = file.filename
@@ -48,7 +47,11 @@ async def upload_image(
     file_name = f"{file_uuid}{file_extension}"
     content = await file.read()
     s3.put_object(
-        settings.S3_IMAGE_BUCKET, str(file_uuid), BytesIO(content), len(content)
+        settings.S3_IMAGE_BUCKET,
+        str(file_uuid),
+        BytesIO(content),
+        len(content),
+        file.content_type or "application/octet-stream",
     )
 
     user_id = current_user.id

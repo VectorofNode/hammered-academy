@@ -16,7 +16,7 @@ export function CoursePageImage({image}: CoursePageImageProps) {
     return (
         <div className="m-4 rounded-2xl h-64 overflow-hidden relative flex justify-center items-center outline">
             {!imgError
-                ? <Image src={image_url} alt="" fill onError={() => setImgError(true)} />
+                ? <Image src={image_url} alt="" fill onError={() => setImgError(true)} className="object-cover object-center" />
                 : <ImageOff />
             }
         </div>

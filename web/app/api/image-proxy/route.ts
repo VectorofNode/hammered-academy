@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     if (!filename) return new NextResponse("Missing file name", {status: 400})
 
-    const backendUrl = `${env.API_URL}/medias/image/${filename}`
+    const backendUrl = `${env.API_URL}/medias/images/${filename}`
 
     const data = await fetch(backendUrl)
     if (!data.ok) {

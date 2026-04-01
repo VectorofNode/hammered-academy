@@ -2,8 +2,7 @@ import { ImageIcon, Upload } from "lucide-react"
 import { Button } from "../ui/button"
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "../ui/empty"
 import { Field, FieldLabel, FieldContent } from "../ui/field"
-import { Input } from "../ui/input"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 import Image from "next/image"
 
 interface UploadImageFieldProps {
@@ -14,15 +13,10 @@ interface UploadImageFieldProps {
 export function UploadImageField({ onChange, imageObjectUrl }: UploadImageFieldProps) {
     const uploadRef = useRef<HTMLInputElement>(null)
 
-    const uploadImage = () => {
-        const currentRef = uploadRef.current
-        if (!currentRef) {
-            return
-        }
-        currentRef.click()
-    }
+    const uploadImage = async () => {
+        const [fileHandle] = await window.showOpenFilePicker()
+        const file = await fileHandle.getFile()
 
-    const imageRecieved = (file: File) => {
         onChange(file)
     }
 
@@ -56,13 +50,6 @@ export function UploadImageField({ onChange, imageObjectUrl }: UploadImageFieldP
                         </Button>
                     </div>
                 }
-                <Input 
-                    type="file" 
-                    ref={uploadRef} 
-                    style={{display: "none"}} 
-                    accept="image/*" 
-                    onChange={(event) => imageRecieved(event.target.files[0])}
-                />
             </FieldContent>
         </Field>
     )
