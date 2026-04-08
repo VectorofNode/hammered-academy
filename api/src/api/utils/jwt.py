@@ -22,6 +22,15 @@ def create_access_token(subject: Union[str, Any], exp_delta: timedelta):
     return encoded_jwt
 
 
+def create_refresh_token(subject: Union[str, Any], exp_delta: timedelta):
+    expires = datetime.now(timezone.utc) + exp_delta
+    to_encode = {"exp": expires, "sub": str(subject), "type": "refresh"}
+
+    encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY", ""), algorithm="HS256")
+
+    return encoded_jwt
+
+
 def get_currrent_user(session: SessionDep, token: str = Depends(oauth2_scheme)):
     try:
         print(token)

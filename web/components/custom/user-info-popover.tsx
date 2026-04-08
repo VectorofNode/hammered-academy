@@ -27,7 +27,7 @@ export function UserInfoPopover() {
                     <Button size={"icon"} onClick={() => router.push("/account")}>
                         <Settings/>
                     </Button>
-                    <Button size={"icon"} variant={"secondary"} onClick={() => signOut()}>
+                    <Button size={"icon"} variant={"secondary"} onClick={() => signOut({callbackUrl: "/login"})}>
                         <LogOut />
                     </Button>
                 </div>
