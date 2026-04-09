@@ -8,7 +8,6 @@ import { signIn } from "next-auth/react";
 export default function Page() {
     return (
         <div className="flex h-screen w-full items-center justify-center px-4">
-            <NavBar />
             <Card>
                 <CardHeader className="text-2xl">Login</CardHeader>
                 <CardContent>

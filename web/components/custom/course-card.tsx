@@ -29,7 +29,7 @@ export function CourseCard({image, title, description, uuid}: Course) {
                 </div>
                 <CardHeader>
                     <CardTitle>{title}</CardTitle>
-                    <CardDescription>{description}</CardDescription>
+                    <CardDescription className="truncate">{description}</CardDescription>
                 </CardHeader>
             </Card>
         </>
