@@ -9,12 +9,14 @@ import { toast } from "sonner"
 interface TeachingCourseTableActionProps {
     uuid: string
     accessToken: string
+    onChange: () => void
 }
 
-export function TeachingCourseTableAction({uuid, accessToken}: TeachingCourseTableActionProps) {
+export function TeachingCourseTableAction({uuid, accessToken, onChange}: TeachingCourseTableActionProps) {
     const deleteCourse = () => {
         deleteCoursesByUuid(uuid, accessToken)
             .catch(err => toast(`${err}`))
+            .finally(() => onChange())
     }
 
     return (
