@@ -19,6 +19,19 @@ export async function getCoursesByUuid(uuid:string): Promise<Course> {
     return res.json()
 }
 
+export async function deleteCoursesByUuid(uuid:string, accessToken: string) {
+    const res = await fetch(`${env.API_URL}/courses/${uuid}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        }
+    })
+    if (res.status == 404) {
+        notFound()
+    }
+}
+
 export async function getFullCourseByUuid(uuid:string): Promise<CourseFull> {
     const res = await fetch(`${env.API_URL}/courses/${uuid}/curriculum`)
     if (res.status == 404) {

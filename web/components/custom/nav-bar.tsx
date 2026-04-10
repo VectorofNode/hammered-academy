@@ -20,7 +20,7 @@ const links: NavLink[] = [
 export function NavBar({children, className, ...props }: ComponentProps<"div">) {
     return (
         <>
-            <div className={cn("mt-2 ml-4 mr-4 flex flex-row space-x-2", className)} {...props}>
+            <div className={cn("mt-2 ml-4 mr-4 flex flex-row space-x-4 items-center", className)} {...props}>
                 <div className="w-full">
                     <NavigationMenu>
                         <NavigationMenuList>

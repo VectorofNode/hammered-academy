@@ -18,8 +18,8 @@ export default function Page() {
                     Create Course
                 </Button>
             </NavBar>
+            <AccountWelcome prefix="" suffix=", welcome to the studio!" />
             <div className="flex flex-col m-4 space-y-4">
-                <AccountWelcome prefix="" suffix=", welcome to the studio!" />
                 <div className="text-xl">My Courses</div>
                 <TeachingCourseTable />
             </div>

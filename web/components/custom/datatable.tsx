@@ -1,6 +1,6 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
-import { ComponentProps } from "react"
+import { ComponentProps, useState } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -9,7 +9,9 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>({ data, columns, className, ...props }: DataTableProps<TData, TValue> & ComponentProps<"div">) {
     const table = useReactTable({
-        data, columns, getCoreRowModel: getCoreRowModel()
+        data, 
+        columns, 
+        getCoreRowModel: getCoreRowModel(),
     })
 
     return (
@@ -33,7 +35,7 @@ export function DataTable<TData, TValue>({ data, columns, className, ...props }:
                 </TableHeader>
                 <TableBody>
                     {table.getRowModel().rows.length? table.getRowModel().rows.map(row => (
-                        <TableRow key={row.id}>
+                        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                             {row.getVisibleCells().map(cell => (
                                 <TableCell key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
