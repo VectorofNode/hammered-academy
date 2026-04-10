@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
                 pathname: "/api/image-proxy/**"
             }
         ]
+    },
+    experimental: {
+        authInterrupts: true
     }
 };
 

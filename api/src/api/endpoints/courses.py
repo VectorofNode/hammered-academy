@@ -22,6 +22,13 @@ async def get_all_courses(
     return courses
 
 
+@router.get("/teaching", response_model=List[CourseRead])
+async def get_teaching_courses(session: SessionDep, user: UserDeps):
+    statement = select(CourseDb).where(CourseDb.owner_id == user.id)
+    courses = session.exec(statement).all()
+    return courses
+
+
 @router.get(
     "/{uuid}",
     response_model=CourseRead,

@@ -70,3 +70,18 @@ export async function createSectionsForCourse(course_uuid: string, sections: Sec
 
     return res.json()
 }
+
+export async function getTeachingCourses(accessToken: string): Promise<Course[]> {
+    const res = await fetch(`${env.API_URL}/courses/teaching`, {
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        }
+    })
+
+    if (res.status != 200) {
+        throw new Error(`${res.status}: ${res.statusText}`)
+    }
+
+    return res.json()
+}

@@ -3,21 +3,27 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuL
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { LoginButton } from "./login-button";
+import { ComponentProps, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 const links: NavLink[] = [
     {
         name: "Home",
         href: "/"
+    },
+    {
+        name: "Studio",
+        href: "/studio"
     }
 ]
 
-export function NavBar() {
+export function NavBar({children, className, ...props }: ComponentProps<"div">) {
     return (
         <>
-            <div className="mt-2 ml-4 mr-4 flex flex-row">
+            <div className={cn("mt-2 ml-4 mr-4 flex flex-row space-x-2", className)} {...props}>
                 <div className="w-full">
                     <NavigationMenu>
-                    <NavigationMenuList>
+                        <NavigationMenuList>
                             {
                                 links.map((link, index) => 
                                     <NavigationMenuItem key={index}>
@@ -30,6 +36,7 @@ export function NavBar() {
                         </NavigationMenuList>
                     </NavigationMenu>
                 </div>
+                <div>{children}</div>
                 <LoginButton />
             </div>
         </>

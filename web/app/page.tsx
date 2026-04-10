@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <AccountWelcome />
+      <AccountWelcome prefix="Hi, " suffix="" />
       <div className="m-4">
         <div className="text-xl">All Courses</div>
         <CourseGrid />

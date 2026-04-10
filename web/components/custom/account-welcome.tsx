@@ -4,7 +4,12 @@ import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User } from "lucide-react";
 
-export function AccountWelcome() {
+interface AccountWelcomeProps {
+    prefix: string
+    suffix: string
+}
+
+export function AccountWelcome({prefix, suffix}: AccountWelcomeProps) {
     const {data: session} = useSession()
 
     return (
@@ -15,7 +20,7 @@ export function AccountWelcome() {
                     <User />
                 </AvatarFallback>
             </Avatar>
-            <div className="text-4xl">Hi, {session?.user?.name}</div>
+            <div className="text-4xl">{prefix}{session?.user?.name}{suffix}</div>
         </div>
     )
 }
