@@ -53,3 +53,19 @@ async def create_section_batch(data: SectionCreateBatch, session: SessionDep):
         session.refresh(s)
 
     return db_sections
+
+
+@router.delete("/{course_uuid}/{order}", status_code=204)
+async def delete_course(course_uuid: str, order: int, session: SessionDep):
+    db_course = session.exec(
+        select(SectionDb).where(
+            SectionDb.course_uuid == course_uuid and SectionDb.order == order
+        )
+    ).first()
+    if not db_course:
+        raise HTTPException(404, "Course not found.")
+
+    session.delete(db_course)
+    session.commit()
+
+    return

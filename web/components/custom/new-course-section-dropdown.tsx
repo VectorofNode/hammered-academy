@@ -2,7 +2,12 @@ import { Delete, Edit, MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
-export function NewCourseSectionDropdown() {
+interface NewCourseSectionDropdownProps {
+    onDelete: () => void
+    onEdit: () => void
+}
+
+export function NewCourseSectionDropdown({onDelete, onEdit}:NewCourseSectionDropdownProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -11,11 +16,11 @@ export function NewCourseSectionDropdown() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEdit()}>
                     <Pencil />
                     Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem variant={"destructive"}>
+                <DropdownMenuItem variant={"destructive"} onClick={() => onDelete()}>
                     <Trash />
                     Remove
                 </DropdownMenuItem>

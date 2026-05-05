@@ -31,7 +31,7 @@ export function NewCourseSectionsList({ onSectionAdd, onSectionDelete, onSection
                             <TableCell>{val.order}</TableCell>
                             <TableCell>{val.title}</TableCell>
                             <TableCell className="text-right">
-                                <NewCourseSectionDropdown />
+                                <NewCourseSectionDropdown onDelete={() => onSectionDelete(val)} onEdit={() => onSectionEdit(val)} />
                             </TableCell>
                         </TableRow>
                     ))}

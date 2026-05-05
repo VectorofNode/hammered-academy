@@ -24,7 +24,7 @@ export default function Page() {
     const { data: session } = useSession()
     const router = useRouter()
     const form = useForm({
-        resolver: zodResolver(courseSchema),
+        resolver: zodResolver(courseSchema as any),
         defaultValues: {
             title: "",
             description: ""

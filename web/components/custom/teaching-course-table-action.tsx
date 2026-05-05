@@ -5,6 +5,7 @@ import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { deleteCoursesByUuid } from "@/lib/utils/courses"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface TeachingCourseTableActionProps {
     uuid: string
@@ -13,6 +14,8 @@ interface TeachingCourseTableActionProps {
 }
 
 export function TeachingCourseTableAction({uuid, accessToken, onChange}: TeachingCourseTableActionProps) {
+    const router = useRouter()
+
     const deleteCourse = () => {
         deleteCoursesByUuid(uuid, accessToken)
             .catch(err => toast(`${err}`))
@@ -27,7 +30,7 @@ export function TeachingCourseTableAction({uuid, accessToken, onChange}: Teachin
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push(`/studio/editor/${uuid}`)}>
                     <Edit />
                     Edit
                 </DropdownMenuItem>

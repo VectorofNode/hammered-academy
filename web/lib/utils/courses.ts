@@ -42,9 +42,25 @@ export async function getFullCourseByUuid(uuid:string): Promise<CourseFull> {
 }
 
 export async function createNewCourse(course:CourseCreate, accessToken: string): Promise<Course> {
-    console.log(course)
     const res = await fetch(`${env.API_URL}/courses`, {
         method: "POST",
+        body: JSON.stringify(course),
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        }
+    })
+
+    if (res.status != 200) {
+        throw new Error(`${res.status}: ${res.statusText}`)
+    }
+
+    return res.json()
+}
+
+export async function updateCourse(course:CourseCreate, accessToken: string): Promise<Course> {
+    const res = await fetch(`${env.API_URL}/courses`, {
+        method: "PUT",
         body: JSON.stringify(course),
         headers: {
             "Authorization": `Bearer ${accessToken}`,
