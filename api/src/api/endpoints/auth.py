@@ -15,7 +15,7 @@ from models.token_schema import TokenSchema
 from models.user import UserDb
 
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/google", response_model=AccessToken)
@@ -39,7 +39,10 @@ async def verify_google_account(data: TokenSchema, session: SessionDep):
         raise HTTPException(401)
 
 
-@router.post("/refresh", response_model=AccessToken)
+@router.post(
+    "/refresh",
+    response_model=AccessToken,
+)
 async def refresh_token(session: SessionDep, refresh_token: str = Body(...)):
     try:
         payload = jwt.decode(refresh_token, os.getenv("SECRET_KEY", ""), "HS256")

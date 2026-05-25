@@ -51,6 +51,7 @@ export default function Page() {
                 form.setValue("title", val.title)
                 form.setValue("description", val.description)
                 setImageUuid(val.image)
+                setImageUrl(`/api/image-proxy?file=${val.image}`)
                 setSections(val.sections.map((section) => {
                     const sec: SectionCreate = {course_uuid: val.uuid, title: section.title, order: section.order}
                     return sec
@@ -59,14 +60,14 @@ export default function Page() {
     }, [reload])
 
     return (
-        <>
+        <div className="h-full">
             <NavBar />
-            <div className="flex flex-row m-4">
+            <div className="flex flex-row m-4 gap-4">
                 <div className="flex flex-col flex-1/2">
                     <UploadImageField imageObjectUrl={imageUrl} onChange={(file) => imageUpdate(file)} />
                     <NewCourseForm form={form} />
                 </div>
-                <div className="flex flex-col flex-1/2">
+                <div className="flex flex-col flex-1/2 h-full">
                     <NewCourseSectionsList 
                         onSectionAdd={(section) => {
                             createSection(section, session?.accessToken ?? unauthorized())
@@ -82,6 +83,6 @@ export default function Page() {
                     />
                 </div>
             </div>
-        </>
+        </div>
     )
 }

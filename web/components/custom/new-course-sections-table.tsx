@@ -16,7 +16,7 @@ interface NewCourseSectionsListProps {
 export function NewCourseSectionsList({ onSectionAdd, onSectionDelete, onSectionEdit, sections, courseUuid: course_uuid }: NewCourseSectionsListProps) {
     return (
         <>
-            <Table>
+            <Table className="h-full">
                 <TableCaption>Sections</TableCaption>
                 <TableHeader>
                     <TableRow>

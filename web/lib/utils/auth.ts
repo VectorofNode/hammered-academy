@@ -22,7 +22,7 @@ export async function refreshToken(refresh_token:string) {
     const res = await fetch(`${env.API_URL}/auth/refresh`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ refresh_token: refresh_token })
+        body: refresh_token
     })
 
     if (res.ok) {
