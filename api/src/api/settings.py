@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import Field, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -36,6 +38,14 @@ class Settings(BaseSettings):
     S3_IMAGE_BUCKET: str = "hammered-academy-image"
 
     GOOGLE_API_CLIENT_ID: str
+
+    RP_ID: str
+    RP_NAME: str
+
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_USER: Optional[str]
+    REDIS_PASS: Optional[str]
 
     model_config = SettingsConfigDict(env_file=".env")
 

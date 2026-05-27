@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.services.s3 import check_and_create_buckets
+from models.passkey import UserPasskey
 
 from .endpoints import (
     courses_router,
@@ -18,6 +19,7 @@ from models import CourseDb, SectionDb, LessonDb
 CourseDb.model_rebuild()
 SectionDb.model_rebuild()
 LessonDb.model_rebuild()
+UserPasskey.model_rebuild()
 
 
 @asynccontextmanager
