@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     REDIS_USER: Optional[str]
     REDIS_PASS: Optional[str]
 
+    FRONT_END_ORIGIN: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

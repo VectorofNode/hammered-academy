@@ -22,6 +22,7 @@ class UserPasskey(SQLModel, table=True):
 class PasskeyRegisterVerifyResponse(BaseModel):
     username: str
     credential_json: Dict[str, Any]
+    device_name: str
 
 
 class PasskeyLoginGrantOptionInfo(BaseModel):

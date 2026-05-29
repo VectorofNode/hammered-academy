@@ -1,4 +1,5 @@
 from datetime import timedelta
+import json
 import os
 
 from fastapi import APIRouter, Body, HTTPException
@@ -65,7 +66,7 @@ async def verify_google_account(data: TokenSchema, session: SessionDep):
 @router.post("/register/passkey")
 def register_passkey(
     reg: UserBase, session: SessionDep, redis_session: RedisSessionDep
-) -> str:
+):
     try:
         userdb = session.exec(select(UserDb).where(UserDb.email == reg.email)).first()
         if not userdb:
@@ -94,7 +95,7 @@ def register_passkey(
         )
         option_json = options_to_json(options)
         redis_session.set(f"challange:registeration:{reg.email}", option_json, 300)
-        return option_json
+        return json.loads(option_json)
     except Exception:
         raise HTTPException(500, "Failed to register passkey.")
 
@@ -105,19 +106,18 @@ def verify_passkey(
     session: SessionDep,
     redis_session: RedisSessionDep,
 ):
+    user = session.exec(select(UserDb).where(UserDb.email == req.username)).first()
+    if not user or not user.id:
+        raise HTTPException(404, "User not found.")
+    if not redis_session.exists(f"challange:registeration:{req.username}"):
+        raise HTTPException(404, "User challange not found.")
+    saved_opt_json = str(redis_session.get(f"challange:registeration:{req.username}"))
+    saved_option = parse_registration_options_json(saved_opt_json)
     try:
-        user = session.exec(select(UserDb).where(UserDb.email == req.username)).first()
-        if not user or not user.id:
-            raise HTTPException(404, "User not found.")
-        if not redis_session.exists(f"challange:{req.username}"):
-            raise HTTPException(404, "User challange not found.")
-        saved_opt_json = str(redis_session.get(f"challange:{req.username}"))
-        saved_option = parse_registration_options_json(saved_opt_json)
-
         verification = verify_registration_response(
             credential=req.credential_json,
             expected_challenge=saved_option.challenge,
-            expected_origin="",
+            expected_origin=settings.FRONT_END_ORIGIN,
             expected_rp_id=settings.RP_ID,
         )
         new_passkey = UserPasskey(
@@ -125,12 +125,14 @@ def verify_passkey(
             credential_id=verification.credential_id,
             public_key=verification.credential_public_key,
             sign_count=verification.sign_count,
+            device_name=req.device_name,
         )
         session.add(new_passkey)
         session.commit()
         session.refresh(new_passkey)
 
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(500, "Failed to verify passkey registeration")
 
 
