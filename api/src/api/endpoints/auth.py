@@ -2,7 +2,7 @@ from datetime import timedelta
 import json
 import os
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, HTTPException, Response
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from jose import JWTError, jwt
@@ -167,7 +167,10 @@ async def get_passkey_access_option(
 
 @router.post("/login/passkey/verification")
 async def verify_passkey_login_option(
-    req: PasskeyLoginVerifyRequest, session: SessionDep, redis_session: RedisSessionDep
+    req: PasskeyLoginVerifyRequest,
+    session: SessionDep,
+    redis_session: RedisSessionDep,
+    response: Response,
 ):
     try:
         user = session.exec(select(UserDb).where(UserDb.email == req.username)).first()
@@ -204,6 +207,24 @@ async def verify_passkey_login_option(
 
         api_token = create_access_token(user.uuid, timedelta(minutes=5))
         refresh_token = create_refresh_token(user.uuid, timedelta(days=7))
+
+        response.set_cookie(
+            "access_token",
+            api_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            max_age=300,
+        )
+
+        response.set_cookie(
+            "refresh_token",
+            refresh_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            max_age=604800,
+        )
         return AccessToken(access_token=api_token, refresh_token=refresh_token)
     except Exception:
         raise HTTPException(500)
