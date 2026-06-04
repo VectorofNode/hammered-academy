@@ -1,8 +1,10 @@
 from datetime import timedelta
 import json
 import os
+import secrets
+from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Response
+from fastapi import APIRouter, Body, HTTPException, Header, Response
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from jose import JWTError, jwt
@@ -22,6 +24,8 @@ from api.settings import settings
 from models.access_token import AccessToken
 from models.passkey import (
     PasskeyLoginGrantOptionInfo,
+    PasskeyLoginGrantOptionResponse,
+    PasskeyLoginVerifyHeader,
     PasskeyLoginVerifyRequest,
     PasskeyRegisterVerifyResponse,
     UserPasskey,
@@ -36,6 +40,7 @@ from webauthn.helpers.structs import (
 from webauthn.helpers import (
     parse_registration_options_json,
     parse_authentication_options_json,
+    base64url_to_bytes,
 )
 
 
@@ -138,30 +143,49 @@ def verify_passkey(
 
 @router.post("/login/passkey/options")
 async def get_passkey_access_option(
-    req: PasskeyLoginGrantOptionInfo,
+    # req: PasskeyLoginGrantOptionInfo,
     session: SessionDep,
     redis_session: RedisSessionDep,
+    response: Response,
 ):
     try:
-        user = session.exec(select(UserDb).where(UserDb.email == req.username)).first()
-        if not user or not user.passkeys:
-            raise HTTPException(404, "User not found.")
-
         allowed_credentials = []
-        for cred in user.passkeys:
-            allowed_credentials.append(
-                PublicKeyCredentialDescriptor(cred.credential_id)
-            )
+        # if req.username:
+        #     user = session.exec(
+        #         select(UserDb).where(UserDb.email == req.username)
+        #     ).first()
+        #     if not user or not user.passkeys:
+        #         raise HTTPException(404, "User not found.")
+
+        #     for cred in user.passkeys:
+        #         allowed_credentials.append(
+        #             PublicKeyCredentialDescriptor(cred.credential_id)
+        #         )
+
+        option_challange = secrets.token_hex(16)
 
         opts = generate_authentication_options(
             rp_id=settings.RP_ID,
             allow_credentials=allowed_credentials,
             user_verification=UserVerificationRequirement.PREFERRED,
         )
-        redis_session.set(f"challange:login:{req.username}", options_to_json(opts), 300)
+        redis_session.set(
+            f"challange:login:{option_challange}", options_to_json(opts), 300
+        )
 
-        return options_to_json(opts)
-    except Exception:
+        response.set_cookie(
+            "login_challange",
+            option_challange,
+            300,
+            secure=True,
+            httponly=True,
+        )
+
+        return PasskeyLoginGrantOptionResponse(
+            login_challange=option_challange, opts=json.loads(options_to_json(opts))
+        )
+    except Exception as e:
+        print(e)
         raise HTTPException(500, "Failed to generate login options.")
 
 
@@ -171,22 +195,20 @@ async def verify_passkey_login_option(
     session: SessionDep,
     redis_session: RedisSessionDep,
     response: Response,
+    headers: Annotated[PasskeyLoginVerifyHeader, Header()],
 ):
     try:
-        user = session.exec(select(UserDb).where(UserDb.email == req.username)).first()
-        if not user or not user.passkeys:
-            raise HTTPException(404, "User not found.")
-
-        saved_options_json = str(redis_session.get(f"challange:login:{req.username}"))
+        saved_options_json = str(
+            redis_session.get(f"challange:login:{headers.login_challange}")
+        )
         saved_options = parse_authentication_options_json(saved_options_json)
 
         cred_id = req.credential_json.get("id")
-        targeted_cred = None
-
-        for pk in user.passkeys:
-            if pk.credential_id.decode() == cred_id:
-                targeted_cred = pk
-                break
+        targeted_cred = session.exec(
+            select(UserPasskey).where(
+                UserPasskey.credential_id == base64url_to_bytes(cred_id or "")
+            )
+        ).first()
 
         if not targeted_cred:
             raise HTTPException(400, "Cannot find available passkeys.")
@@ -194,13 +216,14 @@ async def verify_passkey_login_option(
         verification = verify_authentication_response(
             credential=req.credential_json,
             expected_challenge=saved_options.challenge,
-            expected_origin="",
+            expected_origin=settings.FRONT_END_ORIGIN,
             expected_rp_id=settings.RP_ID,
             credential_public_key=targeted_cred.public_key,
             credential_current_sign_count=targeted_cred.sign_count,
         )
 
         targeted_cred.sign_count = verification.new_sign_count
+        user = targeted_cred.user
         session.add(user)
         session.commit()
         session.refresh(user)
@@ -226,7 +249,8 @@ async def verify_passkey_login_option(
             max_age=604800,
         )
         return AccessToken(access_token=api_token, refresh_token=refresh_token)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(500)
 
 

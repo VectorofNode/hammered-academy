@@ -26,9 +26,18 @@ class PasskeyRegisterVerifyResponse(BaseModel):
 
 
 class PasskeyLoginGrantOptionInfo(BaseModel):
-    username: str
+    username: Optional[str]
+
+
+class PasskeyLoginGrantOptionResponse(BaseModel):
+    login_challange: str
+    opts: Dict[str, Any]
 
 
 class PasskeyLoginVerifyRequest(BaseModel):
-    username: str
     credential_json: Dict[str, Any]
+    login_challange: str
+
+
+class PasskeyLoginVerifyHeader(BaseModel):
+    login_challange: str

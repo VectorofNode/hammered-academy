@@ -2,7 +2,8 @@
 
 import { env } from "process";
 import { AuthToken } from "../models/auth_token";
-import { UserRegisterationInfo, UserRegisterationVerificationInfo } from "../models/user";
+import { PasskeyLoginGrantOptionInfo, PasskeyLoginGrantOptionResponse, PasskeyLoginVerificationInfo, UserRegisterationInfo, UserRegisterationVerificationInfo } from "../models/user";
+import { cookies } from "next/headers";
 
 export async function verifyToken(id_token:string) {
     const res = await fetch(`${env.API_URL}/auth/google`, {
@@ -58,4 +59,63 @@ export async function verifyPasskeyRegisteration(verify_info: UserRegisterationV
     if (!verifyRes.ok) {
         throw new Error("Failed to verify passkey.");
     }
+}
+
+export async function getPasskeyLoginOptions(info:PasskeyLoginGrantOptionInfo) {
+    const res = await fetch(`${env.API_URL}/auth/login/passkey/options`, {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        // body: JSON.stringify(info)
+    })
+
+    if (!res.ok) {
+        throw new Error("Failed to get login options.")
+    }
+
+    const data: PasskeyLoginGrantOptionResponse = await res.json()
+
+    const cookieStore = await cookies()
+    cookieStore.set("login-challange", data.login_challange, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 300,
+        path: "/"
+    })
+
+    return data
+}
+
+export async function verifyPasskeyLogin(info:PasskeyLoginVerificationInfo) {
+    const res = await fetch(`${env.API_URL}/auth/login/passkey/verification`, {
+        method: "POST",
+        body: JSON.stringify(info),
+        headers: {
+            "login_challange": info.login_challange,
+            'Content-Type': 'application/json'
+        }
+    })
+
+    if (!res.ok) {
+        console.log(await res.json())
+        throw new Error("Failed to verify passkey login.")
+    }
+
+    const data: AuthToken = await res.json()
+
+    const cookieStore = await cookies()
+    cookieStore.set("access_token", data.access_token, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 300,
+        path: "/"
+    })
+    cookieStore.set("refresh_token", data.refresh_token, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 604800,
+        path: "/"
+    })
 }
